@@ -1,11 +1,12 @@
-from textconverter import block_to_block_type, block_to_block_splitter
+from textconverter import extract_title, markdown_to_html_node
 
-ordered = "1. First\n\n2. Second"
+text = "![LOTR_image_artistmonkeys](/images/rivendell.png)"
 
-splited = block_to_block_splitter(ordered)
-test = block_to_block_type(ordered)
+def cut_in_lines(markdown):
+    splitted = markdown.split("\n")
+    clean_md = [line.strip() for line in splitted]
+    return clean_md
 
-print(splited)
+html_nodes = markdown_to_html_node(text).to_html()
 
-print(test)
-
+print(html_nodes)

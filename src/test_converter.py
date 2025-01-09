@@ -2,7 +2,7 @@ import unittest
 import re
 
 from textnode import TextNode, TextType
-from textconverter import text_to_textnodes, markdown_to_block, block_to_block_type
+from textconverter import text_to_textnodes, markdown_to_block, block_to_block_type, markdown_to_html_node, extract_title
 
 class TestTextToNodes(unittest.TestCase):
     def test_text_converter_basic(self):
@@ -198,6 +198,52 @@ class TestBlocktoBlock(unittest.TestCase):
         # Valid but tricky content
         assert block_to_block_type("1. ```code```\n2. > quote") == "ordered_list"
 
+class TestMarkdowntoHTML(unittest.TestCase):
+    def test_edge_case1(self):
+        text = """
+   
+            # Title
+
+
+        """
+        node = markdown_to_html_node(text)
+        result = node.to_html()
+        expected = "<div><h1>Title</h1></div>"
+        assert result.strip() == expected.strip()
+
+    def test_mixed_lists(self):
+        text = """1. First
+2. Second
+
+* Bullet
+* Another bullet"""
+        node = markdown_to_html_node(text)
+        result = node.to_html()
+        expected = "<div><ol><li>First</li><li>Second</li></ol><ul><li>Bullet</li><li>Another bullet</li></ul></div>"
+        assert result.strip() == expected.strip()
+
+class RandomTests(unittest.TestCase):
+    def test_extract_title(self):
+        text1 = """Test de phrase en markdown.
+Avec des retours à la ligne.
+    # Ca c'est un titre, au milieu !
+C'est bien les retours à la ligne
+    Et même un avec des espaces en trop.
+    Et un autre !  """
+        text2 = "# Single header"
+        text3 = """## Header 2.
+        # Header 1
+        # Header 2"""
+        result1 = extract_title(text1)
+        result2 = extract_title(text2)
+        result3 = extract_title(text3)
+        expected1 = "# Ca c'est un titre, au milieu !"
+        expected2 = "# Single header"
+        expected3 = "# Header 1"
+        
+        assert result1 == expected1
+        assert result2 == expected2
+        assert result3 == expected3
 
 if __name__ == "__main__":
     unittest.main()

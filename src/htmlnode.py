@@ -32,6 +32,9 @@ class LeafNode(HTMLNode):
         super().__init__(tag, value, None, props)
     
     def to_html(self):
+        if self.tag == "img":
+            props_str = self.props_to_html()
+            return f"<{self.tag}{props_str}/>"
         if not self.value:
             raise ValueError("Value is mandatory.")
         if not self.tag or len(self.tag) == 0:
@@ -47,6 +50,7 @@ class LeafNode(HTMLNode):
                     self.value == value.value and
                     self.props == value.props)
         return False
+
 
 class ParentNode(HTMLNode):
     def __init__(self, tag, children, props=None):
